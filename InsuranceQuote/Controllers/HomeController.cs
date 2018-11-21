@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Data;
 
 
+
 namespace InsuranceQuote.Controllers
 {
     public class HomeController : Controller
@@ -110,8 +111,9 @@ namespace InsuranceQuote.Controllers
                     decimal quote = ((yearQuote + ageQuote + makeQuote + speedingTicketQuote + 50) * hasDUIQuote) * fullCoverageQuote;
 
                     signup.InsuranceQuote = quote;
-                                                          
-
+                    ViewBag.FinalQuote = quote;
+                    
+                                                                          
                     db.SignUps.Add(signup);
                     db.SaveChanges();
                 }
@@ -121,6 +123,23 @@ namespace InsuranceQuote.Controllers
             }
            
         }
-        
+        public ActionResult Admin()
+        {
+            using (InsuraceQuoteEntities db = new InsuraceQuoteEntities())
+            {
+                var signups = db.SignUps.Where(x => x.InsuranceQuote != null).ToList();
+                var signupVms = new List<SignUp>();
+                foreach (var signup in signups)
+                {
+                    var signupVm = new SignUp();
+                    signupVm.FirstName = signup.FirstName;
+                    signupVm.LastName = signup.LastName;
+                    signupVm.EmailAddress = signup.EmailAddress;
+                    signupVm.InsuranceQuote = signup.InsuranceQuote;
+                }
+                return View(signups);
+            }
+                
+        }
     }
 }
